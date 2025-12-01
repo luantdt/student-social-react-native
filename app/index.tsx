@@ -1,25 +1,23 @@
-import { Stack, Link } from 'expo-router';
-
-import { View } from 'react-native';
-
-import { Button } from '@/components/Button';
-import { Container } from '@/components/Container';
-import { ScreenContent } from '@/components/ScreenContent';
+import { useAuthStore } from '@/store/authStore';
+import { auth } from '@/utils/firebase';
+import { Redirect } from 'expo-router';
+import { signOut } from 'firebase/auth';
+import { View, Text, Button, ActivityIndicator } from 'react-native';
 
 export default function Home() {
-  return (
-    <View className={styles.container}>
-      <Stack.Screen options={{ title: 'Home' }} />
-      <Container>
-        <ScreenContent path="app/index.tsx" title="Home"></ScreenContent>
-        <Link href={{ pathname: '/details', params: { name: 'Dan' } }} asChild>
-          <Button title="Show Details" />
-        </Link>
-      </Container>
-    </View>
-  );
-}
+  const { isLoading, user } = useAuthStore();
 
-const styles = {
-  container: 'flex flex-1 bg-white',
-};
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (!user) {
+    return <Redirect href={"/(auth)/signin"} />;
+  }
+
+  return <Redirect href={"/(tab)/newfeed"} />;
+}
